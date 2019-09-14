@@ -1,4 +1,5 @@
 // var eventList = [];
+var alternateColour = false;
 
 const listEvents = eventArray => {
 
@@ -10,9 +11,25 @@ const listEvents = eventArray => {
 
 	for (let [index, obj] in Object.entries(eventArray)) {
 
-		$('#events_table tr:last').after('<tr><td><b>' + eventArray[index].timestamp + '</b></td></tr>');
-		$('#events_table tr:last').after('<tr><td>' + eventArray[index].subject + '</td></tr>');
-		$('#events_table tr:last').after('<tr><td>' + eventArray[index].payload + '</td></tr>');
+		$(document).ready(function() {
+			if (alternateColour == false) {
+				$("table#events_table").css("background-color", "#FFFFFF");
+				alternateColour = true;
+			}
+			else if (alternateColour == true) {
+				$("table#events_table").css("background-color", "#EFF1F1");
+				alternateColour = false;
+			}
+		});
+
+
+		if (eventArray[index].legacyEvent == false) {
+			$('#events_table tr:first').after('<img src="amplitude_16.png">');
+		}	
+		$('#events_table tr:first').after('<tr><td><code><font size="2">' + eventArray[index].payload + '</font></code></td></tr>');
+		$('#events_table tr:first').after('<tr><td><b><code><font size="2">' + eventArray[index].subject + '</font></code></b></td></tr>');
+		$('#events_table tr:first').after('<tr><td><font size="2">' + eventArray[index].timestamp + '</font></td></tr>');
+		
 	}
 
 	if (eventArray.length == 0) {
@@ -39,7 +56,7 @@ function parsePayload(eventMessage, eventField, eventValue) {
 			}
 			// for all subsequent properties, add newline delimeter
 			else {
-				payloadString = payloadString + "\n" + payloadKey + ": " + payloadValue;
+				payloadString = payloadString + "<br/>" + payloadKey + ": " + payloadValue;
 			}
 		}
 		// console.log("payload values: " + payloadString);
@@ -54,7 +71,7 @@ function parsePayload(eventMessage, eventField, eventValue) {
 			}
 			// for all subsequent properties, add newline delimeter
 			else {
-				payloadString = payloadString + "\n" + "filter." + filterKey + ": " + filterValue;
+				payloadString = payloadString + "<br/>" + "filter." + filterKey + ": " + filterValue;
 			}
 		}
 		// console.log("filter values: " + payloadString);
@@ -80,6 +97,10 @@ function parseSubject(eventMessage) {
 
 		delete eventMessage['domain'], delete eventMessage['subdomain'], delete eventMessage['action']
 		eventMessage.subject = newSubject;
+		eventMessage.legacyEvent = false;
+	}
+	else {
+		eventMessage.legacyEvent = true;
 	}
 }
 
@@ -114,7 +135,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	eventArray = message.data;
 
 	// sort events by timestamp, newest first
-	eventArray.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+	eventArray.sort((a,b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
 	console.log("received data");
 	for (let [obj, event] of Object.entries(eventArray)) {
@@ -123,6 +144,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 	// popualte popup html
 	listEvents(eventList);
+
+	return true;
 });
 
 
@@ -135,8 +158,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		listEvents(eventList);
 
 		chrome.runtime.sendMessage({message: "clearData"}, function(response) {});
-
 	});
+	
 });
 
 var bgPort = chrome.runtime.connect({name: "EventPopup"});

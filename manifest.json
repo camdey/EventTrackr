@@ -29,7 +29,7 @@
 	  "*://bo-tracking.izettle.com/track"
 	],
 	"web_accessible_resources": [
-   		"icon.png"
+   		"amplitude_16.png"
  	],
 
 	"manifest_version": 2

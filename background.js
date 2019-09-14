@@ -90,6 +90,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		console.log("background data cleared");
 		messageArray = [];
 	}
+
+	return true;
 });
 
 var popupPort;
