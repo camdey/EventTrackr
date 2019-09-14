@@ -1,0 +1,36 @@
+{
+    "name": "Event Listener",
+    "version": "1.0",
+    "description": "Checks for Tracking Messages",
+    "background": {
+    	"scripts": ["background.js"]
+  	},
+
+  	"page_action": {
+  		"default_popup": "popup.html",
+		"default_icon": {
+        	"16": "izettle_16.png",
+        	"32": "izettle_32.png",
+        	"48": "izettle_48.png"
+      	}
+  	},
+
+  	"icons": {
+    	"16": "izettle_16.png",
+    	"32": "izettle_32.png",
+    	"48": "izettle_48.png",
+    	"128": "izettle_128.png"
+  	},
+
+	"permissions": [
+	  "webRequest",
+	  "declarativeContent",
+	  "*://my.izettle.com/dachshund",
+	  "*://bo-tracking.izettle.com/track"
+	],
+	"web_accessible_resources": [
+   		"icon.png"
+ 	],
+
+	"manifest_version": 2
+}
