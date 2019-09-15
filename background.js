@@ -60,7 +60,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 	["requestBody"]
 );
 
-// change icon from grayscale to colour if on iZettle page
+// change icon from grayscale to colour if on correct page
 chrome.runtime.onInstalled.addListener(function() {
 	chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
 		chrome.declarativeContent.onPageChanged.addRules([{

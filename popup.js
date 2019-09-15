@@ -1,5 +1,5 @@
 // var eventList = [];
-var alternateColour = false;
+var amplitudeIcon = "";
 
 const listEvents = eventArray => {
 
@@ -7,30 +7,30 @@ const listEvents = eventArray => {
 	// $("#events_table tr").remove();
 
 	// always have a tbody to add data .after to (needed for update while popup open if popup currently empty)
+	// $('#events_table > thead').append('<th>Time</th>' + '<th>Event Name</th>' + '<th>Payload</th>');
 	$('#events_table > tbody:last-child').append('<tr>...</tr><tr>...</tr>');
 
 	for (let [index, obj] in Object.entries(eventArray)) {
 
-		$(document).ready(function() {
-			if (alternateColour == false) {
-				$("table#events_table").css("background-color", "#FFFFFF");
-				alternateColour = true;
-			}
-			else if (alternateColour == true) {
-				$("table#events_table").css("background-color", "#EFF1F1");
-				alternateColour = false;
-			}
-		});
-
-
 		if (eventArray[index].legacyEvent == false) {
-			$('#events_table tr:first').after('<img src="amplitude_16.png">');
-		}	
-		$('#events_table tr:first').after('<tr><td><code><font size="2">' + eventArray[index].payload + '</font></code></td></tr>');
-		$('#events_table tr:first').after('<tr><td><b><code><font size="2">' + eventArray[index].subject + '</font></code></b></td></tr>');
-		$('#events_table tr:first').after('<tr><td><font size="2">' + eventArray[index].timestamp + '</font></td></tr>');
+			amplitudeIcon = "<img src='amplitude_16.png'/>"
+		} else if (eventArray[index].legacyEvent == true) {
+			amplitudeIcon = "";
+		}
+
+		$('#events_table tr:first').after(
+			'<tr><td>' + amplitudeIcon + '</td>' +
+			'<td><font size="2">' + eventArray[index].timestamp + '</font></td>' +
+			'<td><code><font size="2">' + eventArray[index].subject + '</font></code></td>' +
+			'<td><code><font size="2">' + eventArray[index].payload + '</font></code></td></tr>'
+			);
 		
 	}
+
+		$(document).ready(function() {
+		  $("table#events_table tr:even").css("background-color", "#FFFFFF");
+		  $("table#events_table tr:odd").css("background-color", "#EFF1F1");
+		});
 
 	if (eventArray.length == 0) {
 		// clear event log
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		chrome.runtime.sendMessage({message: "clearData"}, function(response) {});
 	});
-	
+
 });
 
 var bgPort = chrome.runtime.connect({name: "EventPopup"});

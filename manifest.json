@@ -9,17 +9,17 @@
   	"page_action": {
   		"default_popup": "popup.html",
 		"default_icon": {
-        	"16": "izettle_16.png",
-        	"32": "izettle_32.png",
-        	"48": "izettle_48.png"
+        	"16": "icon_16.png",
+        	"32": "icon_32.png",
+        	"48": "icon_48.png"
       	}
   	},
 
   	"icons": {
-    	"16": "izettle_16.png",
-    	"32": "izettle_32.png",
-    	"48": "izettle_48.png",
-    	"128": "izettle_128.png"
+    	"16": "icon_16.png",
+    	"32": "icon_32.png",
+    	"48": "icon_48.png",
+    	"128": "icon_128.png"
   	},
 
 	"permissions": [
