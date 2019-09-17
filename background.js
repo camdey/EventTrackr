@@ -36,14 +36,6 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 				// move latest event to front of array
 				messageArray.unshift(body);
 			}
-
-			if (popupOpen == true) {
-				arrayOfOne = [];
-				arrayOfOne.push(body);
-				chrome.runtime.sendMessage({data: arrayOfOne}, function(response) {
-				console.log("sent message while open");
-				});
-			}
 		}
 
 		// remove excess events from array
@@ -51,6 +43,23 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 			messageArray.pop();
 		}
 
+
+		// clear existing storage
+		chrome.storage.sync.set({'messageArray': []}, function() {
+		  console.log("storage cleared");
+		});
+
+		chrome.storage.sync.set({'messageArray': messageArray}, function() {
+		  console.log("save to storage");
+		});
+
+
+		if (popupOpen == true) {
+			chrome.runtime.sendMessage({message: "eventsReceived"}, function(response) {
+				console.log("sending events received while open");
+				// console.log(messageArray);
+			});
+		}
 	}
 },
 {
@@ -77,18 +86,23 @@ chrome.runtime.onInstalled.addListener(function() {
 // send event messages to popup.js when handshake message received
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
-	// if handshake message received, send back data
+	// if handshake message received, send back signal to fetch data from storage
 	if (request.message == "handshake") {
 		popupOpen = true;
 
-		chrome.runtime.sendMessage({data: messageArray}, function(response) {
-			console.log("sent message on open");
+		chrome.runtime.sendMessage({message: "eventsReceived"}, function(response) {
+			console.log("sending events received before open");
+			// console.log(messageArray);
 		});
 	}
 
 	if (request.message == "clearData") {
-		console.log("background data cleared");
+
+		// clear existing storage
 		messageArray = [];
+		chrome.storage.sync.set({'messageArray': []}, function() {
+		  console.log("storage cleared");
+		});
 	}
 
 	return true;
@@ -102,8 +116,8 @@ chrome.runtime.onConnect.addListener(function(port) {
 
     	// if port closes, popup window has closed
     	popupPort.onDisconnect.addListener(function() {
-			popupOpen = true;
-			console.log("Popup Closed");
+			popupOpen = false;
+			console.log("popup closed");
     	});
 	}
 });
