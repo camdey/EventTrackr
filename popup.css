@@ -1,3 +1,11 @@
 #tableDiv{
     overflow-x: scroll;
+    overflow-y: scroll;
+}
+h1 {
+    margin-top: 0;
+}
+td {
+   text-indent: -4.0em;
+   padding-left: 4.0em;
 }

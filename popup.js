@@ -2,19 +2,10 @@ var amplitudeIcon = "";
 
 const listEvents = eventArray => {
 
-	// always have a tbody to add data .after to (needed for update while popup open if popup currently empty)
-	// $('#events_table > thead').append('<th>Time</th>' + '<th>Event Name</th>' + '<th>Payload</th>');
 	$('#events_table > tbody:last-child').append('<tr>...</tr><tr>...</tr>');
-	$("#events_table tr").empty();
+	// empty on each refresh of events
+	$("#events_table tr:gt(0)").remove();
 
-	// Object.keys(eventArray).forEach(function(prop) {
-	// 	console.log("message");
-	// 	console.log(eventArray[prop]);
-	// 	console.log("message values");
-	// 	console.log(eventArray[prop].subject);
-	// })
-
-	// for (let [index, obj] in Object.entries(eventArray)) {
 	Object.keys(eventArray).forEach(function(message) {
 
 		// if not a legacy event, display Amplitude icon
@@ -26,27 +17,35 @@ const listEvents = eventArray => {
 
 		$('#events_table tr:first').after(
 			'<tr><td>' + amplitudeIcon + '</td>' +
-			'<td><font size="2">' + eventArray[message].localTime + '</font></td>' +
-			'<td><code><font size="2">' + eventArray[message].subject + '</font></code></td>' +
-			'<td><code><font size="2">' + eventArray[message].payload + '</font></code></td></tr>'
+			'<td class="localTime"><font size="2">' + eventArray[message].localTime + '</font></td>' +
+			'<td class="subject"><code><font size="2">' + eventArray[message].subject + '</font></code></td>' +
+			'<td class="payload">' + '</td></tr>'
 		);
 
-		// $('#events_table tr:first').after('<tr><td><code><font size="2">' + eventArray[index].payload + '</font></code></td></tr>');
-		// $('#events_table tr:first').after('<tr><td><code><font size="2">' + eventArray[index].subject + '</font></code></td></tr>');
-		// $('#events_table tr:first').after('<tr><td><font size="2">' + eventArray[index].timestamp + '</font></td></tr>');
-		// $('#events_table tr:first').after('<tr><td>' + amplitudeIcon + '</td></tr>');
+		// if payload is not empty, enumerate through payload object
+		if (jQuery.isEmptyObject(eventArray[message].payload) == false) {
+			for (let [key, value] of Object.entries(eventArray[message].payload)) {
+				// if first property, don't add break line
+				if (key == Object.keys(eventArray[message].payload)[0]) {
+					$('#events_table td.payload').first().append('<code><font size="2">' + key + ': ' + value + '</font></code>');
+				}
+				else {
+					$('#events_table td.payload').first().append('<code><font size="2"><br/>' + key + ': ' + value + '</font></code>');
+				}
+			}
+		}
 
 	});
 
-		// alternating row colours in table
-		$(document).ready(function() {
-		  $("table#events_table tr:even").css("background-color", "#FFFFFF");
-		  $("table#events_table tr:odd").css("background-color", "#F3F3F3");
-		});
+	// set alternating row colours in table
+	$(document).ready(function() {
+	  $('table#events_table tr:even').css("background-color", "#FFFFFF");
+	  $('table#events_table tr:odd').css("background-color", "#F3F3F3");
+	});
 
 	if (eventArray.length == 0) {
-		// clear event log
-		$("#events_table tr").empty();
+		// clear event log in popup
+		$('#events_table tr').empty();
 	}
 	
 };
@@ -99,37 +98,12 @@ function parsePayload(eventMessage, eventField, eventValue) {
   	if (jQuery.isEmptyObject(eventValue.filter) == true) {
   		// delete empty filter
   		delete eventValue['filter']
-
-      	for (let [payloadKey, payloadValue] of Object.entries(eventValue)) {
-
-      		// for first filter property, don't add delimeter
-			if (payloadString.length == 0) {
-		    	payloadString += payloadKey + ": " + payloadValue;
-			}
-			// for all subsequent properties, add newline delimeter
-			else {
-				payloadString = payloadString + "<br/>" + payloadKey + ": " + payloadValue;
-			}
-		}
 	}
-	// if filter is not empty
+	// if filter is not empty, move filter to payload
   	else if (jQuery.isEmptyObject(eventValue.filter) == false) {
-      	for (let [filterKey, filterValue] of Object.entries(eventValue.filter)) {
-
-      		// for first filter property, don't add delimeter
-			if (payloadString.length == 0) {
-		    	payloadString += "filter." + filterKey + ": " + filterValue;
-			}
-			// for all subsequent properties, add newline delimeter
-			else {
-				payloadString = payloadString + "<br/>" + "filter." + filterKey + ": " + filterValue;
-			}
-		}
+  		eventMessage.payload = eventValue.filter;
 	}
-
-	// delete old payload object, add new key:value pair
-	delete eventMessage['payload'];
-	eventMessage.payload = payloadString;
+	console.log(eventMessage);
 }
 
 // for new events, concatenate event name fields into one
