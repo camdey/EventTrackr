@@ -57,7 +57,6 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 		if (popupOpen == true) {
 			chrome.runtime.sendMessage({message: "eventsReceived"}, function(response) {
 				console.log("sending events received while open");
-				// console.log(messageArray);
 			});
 		}
 	}

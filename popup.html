@@ -6,23 +6,23 @@
     <link rel="stylesheet" type="text/css" href="popup.css">
     <style>
     body {
-      height: 200px;
-      width: 600px;
-      /*outline: none;*/
+		height: 200px;
+		width: 400px;
+		background-color: #DCDCDC;
     }
     </style>
   </head>
 <body>
-	<div id="tableDiv" style="width:600px;">
-		<h1 style="font-weight:bold; text-align:center;">Event History</h2>
-		<button type="button" id="clearLog">Clear Log</button>
+	<div id="tableDiv" style="width:400px; height:200px;">
+		<h1 style="font-weight:bold; text-align:center;">Event Log</h2>
+		<button type="button" button id="clearLog">Clear Log</button>
 		<table id="events_table">
 			<thead>
 				<tr>
-					<th> </th>
-					<th> Time </th>
-					<th> Event Name </th>
-					<th> Payload </th>
+					<th id="AmplitudeCol"> </th>
+					<th id="TimeCol"> Time </th>
+					<th id="NameCol"> Event Name </th>
+					<!-- <th id="PayloadCol"> Payload </th> -->
 		       </tr>
  			</thead>
 			<tbody>

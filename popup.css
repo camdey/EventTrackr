@@ -1,11 +1,55 @@
 #tableDiv{
     overflow-x: scroll;
     overflow-y: scroll;
+    max-width: 100%;
+    white-space: nowrap;
 }
+/*table {
+	border: 1px solid black;
+}*/
+#AmplitudeCol {
+	/*padding:1em;*/
+	width:24px;
+}
+#TimeCol {
+	/*padding:1em;*/
+	width:56px;
+}
+#NameCol {
+	/*padding:1em;*/
+	width:200px;
+}
+/*#PayloadCol {
+	width:90px;
+}*/
+
+/* vertical align row cells */
+td, th {
+	vertical-align:top;
+}
+
+td {
+	/*border-bottom: 1px dotted black;*/
+	/*border-top: 1px solid black;*/
+}
+
+/* heading */
 h1 {
     margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+    background-color: #283663;
+    color: #FFFFFF;
+    border-radius: 6px;
 }
-td {
-   text-indent: -4.0em;
-   padding-left: 4.0em;
+/* constrain column width of first column */
+$('div#tableDiv table tr td').eq(0).css('width','16px');
+
+/* button style */
+#clearLog:hover {
+	border: none;
+	outline: 0;
+	background: #FFA08E;
+	border-radius: 6px;
+	cursor: pointer;
 }

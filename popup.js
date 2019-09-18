@@ -12,14 +12,14 @@ const listEvents = eventArray => {
 		if (eventArray[message].legacyEvent == false) {
 			amplitudeIcon = "<img src='amplitude_16.png'/>"
 		} else if (eventArray[message].legacyEvent == true) {
-			amplitudeIcon = "";
+			amplitudeIcon = "<img src='spacer_16.png'/>";
 		}
 
 		$('#events_table tr:first').after(
 			'<tr><td>' + amplitudeIcon + '</td>' +
 			'<td class="localTime"><font size="2">' + eventArray[message].localTime + '</font></td>' +
-			'<td class="subject"><code><font size="2">' + eventArray[message].subject + '</font></code></td>' +
-			'<td class="payload">' + '</td></tr>'
+			'<td class="subject"><font size="2">' + eventArray[message].subject + '</font></td></tr>'
+			// '<td class="payload">' + '</td></tr>'
 		);
 
 		// if payload is not empty, enumerate through payload object
@@ -27,25 +27,24 @@ const listEvents = eventArray => {
 			for (let [key, value] of Object.entries(eventArray[message].payload)) {
 				// if first property, don't add break line
 				if (key == Object.keys(eventArray[message].payload)[0]) {
-					$('#events_table td.payload').first().append('<code><font size="2">' + key + ': ' + value + '</font></code>');
+					$('#events_table td.subject').first().append('<code><font size="2"><br/>' + key + ': ' + value + '</font></code>');
 				}
 				else {
-					$('#events_table td.payload').first().append('<code><font size="2"><br/>' + key + ': ' + value + '</font></code>');
+					$('#events_table td.subject').first().append('<code><font size="2"><br/>' + key + ': ' + value + '</font></code>');
 				}
 			}
 		}
 
 	});
-
 	// set alternating row colours in table
-	$(document).ready(function() {
-	  $('table#events_table tr:even').css("background-color", "#FFFFFF");
-	  $('table#events_table tr:odd').css("background-color", "#F3F3F3");
-	});
+	// $(document).ready(function() {
+	//   $('table#events_table tr:even').css("background-color", "#FFFFFF");
+	//   $('table#events_table tr:odd').css("background-color", "#F3F3F3");
+	// });
 
 	if (eventArray.length == 0) {
 		// clear event log in popup
-		$('#events_table tr').empty();
+		$("#events_table tr:gt(0)").remove();
 	}
 	
 };
@@ -92,8 +91,6 @@ function parseEvent(eventMessage, eventList) {
 
 function parsePayload(eventMessage, eventField, eventValue) {
 
-	var payloadString = "";
-
   	// if filter empty, ignore filter
   	if (jQuery.isEmptyObject(eventValue.filter) == true) {
   		// delete empty filter
@@ -103,7 +100,6 @@ function parsePayload(eventMessage, eventField, eventValue) {
   	else if (jQuery.isEmptyObject(eventValue.filter) == false) {
   		eventMessage.payload = eventValue.filter;
 	}
-	console.log(eventMessage);
 }
 
 // for new events, concatenate event name fields into one

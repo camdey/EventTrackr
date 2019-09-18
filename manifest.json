@@ -30,7 +30,8 @@
 	  "*://bo-tracking.izettle.com/track"
 	],
 	"web_accessible_resources": [
-   		"amplitude_16.png"
+   		"amplitude_16.png",
+   		"spacer_16.png"
  	],
 
 	"manifest_version": 2
