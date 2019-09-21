@@ -1,12 +1,11 @@
-var amplitudeIcon = "";
-
 const listEvents = eventArray => {
 
-	$('#events_table > tbody:last-child').append('<tr>...</tr><tr>...</tr>');
+	$('#eventsTable > tbody:last-child').append('<tr>...</tr><tr>...</tr>');
 	// empty on each refresh of events
-	$("#events_table tr:gt(0)").remove();
+	$('#eventsTable tr:gt(0)').remove();
 
 	Object.keys(eventArray).forEach(function(message) {
+		var amplitudeIcon = "";
 
 		// if not a legacy event, display Amplitude icon
 		if (eventArray[message].legacyEvent == false) {
@@ -15,38 +14,27 @@ const listEvents = eventArray => {
 			amplitudeIcon = "<img src='spacer_16.png'/>";
 		}
 
-		$('#events_table tr:first').after(
+		$('#eventsTable tr:first').after(
 			'<tr><td>' + amplitudeIcon + '</td>' +
 			'<td class="localTime"><font size="2">' + eventArray[message].localTime + '</font></td>' +
-			'<td class="subject"><font size="2">' + eventArray[message].subject + '</font></td></tr>'
-			// '<td class="payload">' + '</td></tr>'
+			'<td class="subject"><font size="2">' + "\u00A0" + eventArray[message].subject + '</font></td></tr>'
 		);
 
 		// if payload is not empty, enumerate through payload object
 		if (jQuery.isEmptyObject(eventArray[message].payload) == false) {
 			for (let [key, value] of Object.entries(eventArray[message].payload)) {
-				// if first property, don't add break line
-				if (key == Object.keys(eventArray[message].payload)[0]) {
-					$('#events_table td.subject').first().append('<code><font size="2"><br/>' + key + ': ' + value + '</font></code>');
-				}
-				else {
-					$('#events_table td.subject').first().append('<code><font size="2"><br/>' + key + ': ' + value + '</font></code>');
-				}
+				$('#eventsTable td.subject').first().append('<code><font size="2"><br/>' + "\u00A0 \u00A0" + 
+					key + ': ' + value + '</font></code>');
 			}
 		}
 
 	});
-	// set alternating row colours in table
-	// $(document).ready(function() {
-	//   $('table#events_table tr:even').css("background-color", "#FFFFFF");
-	//   $('table#events_table tr:odd').css("background-color", "#F3F3F3");
-	// });
+	// $('#eventsTable th').css({'border-bottom-color': 'yellow'});
 
 	if (eventArray.length == 0) {
 		// clear event log in popup
-		$("#events_table tr:gt(0)").remove();
+		$('#eventsTable tr:gt(0)').remove();
 	}
-	
 };
 
 function processEvents(eventStorage, eventList) {
@@ -74,7 +62,7 @@ function parseEvent(eventMessage, eventList) {
 	for (let [eventField, eventValue] of Object.entries(eventMessage)) {
 		// if field is payload and payload is not empty...
 	    if (eventField == 'payload' & jQuery.isEmptyObject(eventValue) == false) {
-	    	parsePayload(eventMessage, eventField, eventValue);
+	    	parsePayload(eventMessage, eventValue);
 	    }
 	}
 
@@ -89,17 +77,23 @@ function parseEvent(eventMessage, eventList) {
 	eventList.push(eventMessage);
 };
 
-function parsePayload(eventMessage, eventField, eventValue) {
+function parsePayload(eventMessage, payloadObject) {
 
+    // if errors not empty, only take first error and move to payload
+    if (jQuery.isEmptyObject(payloadObject.errors) == false) {
+    	Object.assign(payloadObject, payloadObject.errors[0]);
+    	delete payloadObject['errors'];
+    }
   	// if filter empty, ignore filter
-  	if (jQuery.isEmptyObject(eventValue.filter) == true) {
-  		// delete empty filter
-  		delete eventValue['filter']
+  	if (jQuery.isEmptyObject(payloadObject.filter) == true) {
+  		delete payloadObject['filter'];
 	}
 	// if filter is not empty, move filter to payload
-  	else if (jQuery.isEmptyObject(eventValue.filter) == false) {
-  		eventMessage.payload = eventValue.filter;
-	}
+  	else if (jQuery.isEmptyObject(payloadObject.filter) == false) {
+  		// eventMessage.payload = payloadObject.filter;
+  		Object.assign(payloadObject, payloadObject.filter);
+  		delete payloadObject['filter'];
+  	}
 }
 
 // for new events, concatenate event name fields into one
