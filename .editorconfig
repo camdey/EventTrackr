@@ -1,5 +1,5 @@
 root = true
 
-[*.{c,cpp,h,hpp}]
+[*.{js, json, css, html}]
 indent_style = tab
 indent_size = 2
