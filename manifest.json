@@ -3,35 +3,35 @@
     "version": "1.0",
     "description": "Checks for Tracking Messages",
     "background": {
-    	"scripts": ["background.js"]
+    	"scripts": ["background/background.js"]
   	},
 
   	"page_action": {
-  		"default_popup": "popup.html",
+  		"default_popup": "popup/popup.html",
 		"default_icon": {
-        	"16": "icon_16.png",
-        	"32": "icon_32.png",
-        	"48": "icon_48.png"
+        	"16": "images/icon_16.png",
+        	"32": "images/icon_32.png",
+        	"48": "images/icon_48.png"
       	}
   	},
 
   	"icons": {
-    	"16": "icon_16.png",
-    	"32": "icon_32.png",
-    	"48": "icon_48.png",
-    	"128": "icon_128.png"
+    	"16": "images/icon_16.png",
+    	"32": "images/icon_32.png",
+    	"48": "images/icon_48.png",
+    	"128": "images/icon_128.png"
   	},
 
 	"permissions": [
-	  "webRequest",
-	  "storage",
-	  "declarativeContent",
-	  "*://my.izettle.com/dachshund",
-	  "*://bo-tracking.izettle.com/track"
+		"webRequest",
+		"storage",
+		"declarativeContent",
+		"*://my.izettle.com/dachshund",
+		"*://bo-tracking.izettle.com/track"
 	],
 	"web_accessible_resources": [
-   		"amplitude_16.png",
-   		"spacer_16.png"
+   		"images/amplitude_16.png",
+   		"images/spacer_16.png"
  	],
 
 	"manifest_version": 2
