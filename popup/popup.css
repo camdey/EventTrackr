@@ -1,0 +1,90 @@
+#tableDiv{
+    overflow-x: auto;
+    overflow-y: auto;
+    max-width: 100%;
+    white-space: nowrap;
+    padding-left: 10px;
+    width: 420px;
+    height: 240px;
+}
+
+#AmplitudeCol {
+	width: 24px;
+}
+#TimeCol {
+	width: 56px;
+}
+#EventCol {
+	width: 200px;
+}
+
+html {
+	padding: 0px;
+	margin: 0px;
+}
+
+body {
+	height: 240px;
+	width: 400px;
+	padding-bottom: 0px;
+	padding-right: 10px;
+	background-color: #DCDCDC;		/* grey */
+	margin: 0px;					/* remove outer margin */
+	/*border: #283663 solid 8px; 	/* add border to popup */*/
+}
+
+/* remove gap between table columns */
+table {
+	border-collapse: collapse;
+	margin-top: 10%;
+}
+
+/* vertical align row cells */
+tr, td, th {
+	vertical-align: top;
+}
+
+/* line below heading */
+th {
+	border-bottom: 2px solid black;
+}
+
+/* heading */
+h1 {
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 20px;
+    width: 100%;
+    height: 14%;
+    background-color: #283663;		/* navy blue */
+    color: white;
+    font-family: Helvetica;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: top;
+    position: fixed; 				/* extend across entire popup */
+    left: 0px;						/* removes left margin */
+    line-height: 135%;				/* push h1 text further down */
+}
+
+/* button style */
+.clearBtn {
+	background-color: #F5826B;		/* salmon */
+	border-radius: 6px;
+	color: white; 
+	font-weight: bold;
+	transition-duration: 0.15s;
+	border: 0px;
+	position: fixed;
+	top: 4%;
+
+
+}
+
+.clearBtn:hover {
+	outline: 0;
+	border-radius: 6px;
+	cursor: pointer;
+	background-color: #E36C54; 		/* dark salmon */
+	box-shadow: 0 1px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.2);
+}
