@@ -1,5 +1,7 @@
 var messageArray = [];
 var popupOpen = false;
+var popupPort;
+var lastClosed = new Date(); // give starting value
 
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
 	if(details.method == "POST") {
@@ -46,7 +48,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
 		// clear existing storage
 		chrome.storage.sync.set({'messageArray': []}, function() {
-		  console.log("reset storage object");
+			console.log("storage cleared");
 		});
 
 		chrome.storage.sync.set({'messageArray': messageArray}, function() {
@@ -61,12 +63,15 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 		}
 	}
 },
+
+
 {
 	// track events from both old and new tracking services
 	urls: ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"]
 },
 	["requestBody"]
 );
+
 
 // change icon from grayscale to colour if on correct page
 chrome.runtime.onInstalled.addListener(function() {
@@ -82,27 +87,54 @@ chrome.runtime.onInstalled.addListener(function() {
 });
 
 
+function clearStorage() {
+	// empty array
+	messageArray = [];
+
+	chrome.storage.sync.set({'messageArray': []}, function() {
+		console.log("storage cleared");
+	});
+};
+
+
+function clearLogOnTimeout() {
+	var currentTime = new Date();
+	var elapsedMinutes = (currentTime - lastClosed) / 60000;
+
+	if (elapsedMinutes >= 1) {
+		console.log("cleared log after 30min inactivity")
+		console.log(elapsedMinutes);
+
+		clearStorage();
+
+		// send message to popup to clear UI
+		chrome.runtime.sendMessage({message: "clearLogOnTimeout"}, function(response) {
+			console.log("sending message to popup to clear UI");
+		});
+	}
+}
+
+
 // send event messages to popup.js when handshake message received
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 	if (request.message == "popupOpen") {
 		popupOpen = true;
 		console.log("popup opened");
+
+		clearLogOnTimeout();
 	}
 
-	if (request.message == "clearData") {
+	if (request.message == "clearLogOnButtonClick") {
 		// clear existing storage
-		messageArray = [];
-		chrome.storage.sync.set({'messageArray': []}, function() {
-			console.log("storage cleared");
-		});
+		clearStorage();
 	}
 
 	return true;
 });
 
+
 // listen for popup being closed
-var popupPort;
 chrome.runtime.onConnect.addListener(function(port) {
 	// check port name
 	if (port.name == "EventPopup") {
@@ -112,6 +144,9 @@ chrome.runtime.onConnect.addListener(function(port) {
     	popupPort.onDisconnect.addListener(function() {
 			popupOpen = false;
 			console.log("popup closed");
+
+			// set last closed time for popup
+			lastClosed = new Date();
     	});
 	}
 });
