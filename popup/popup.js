@@ -128,7 +128,6 @@ function getEvents(key, callback) {
 
 // receive message from background.js
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-
 	if (request.message == "eventsReceived") {
 
 		var eventList = [];
@@ -140,6 +139,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		})
 	}
 
+	if (request.message == "clearLogOnTimeout") {
+		eventList = [];
+		listEvents(eventList);
+	}
+
 	return true;
 });
 
@@ -147,13 +151,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 // only listen for button clicks after page finished loading
 document.addEventListener('DOMContentLoaded', function () {
 
-	document.getElementById("clearLog").addEventListener("click", function() {
+	document.getElementById("clearLogOnButtonClick").addEventListener("click", function() {
 
 		eventList = [];
 		listEvents(eventList);
 
 		// send message to background.js to clear data
-		chrome.runtime.sendMessage({message: "clearData"}, function(response) {});
+		chrome.runtime.sendMessage({message: "clearLogOnButtonClick"}, function(response) {});
 	});
 
 });
