@@ -1,26 +1,31 @@
 {
-    "name": "Event Listener",
-    "version": "1.0",
-    "description": "Checks for Tracking Messages",
-    "background": {
-    	"scripts": ["background/background.js"]
-  	},
+  "name": "Event Trackr",
+  "version": "1.0",
+  "description": "Checks for Tracking Messages",
+  "background": {
+  	"scripts": ["background/background.js"]
+	},
 
-  	"page_action": {
-  		"default_popup": "popup/popup.html",
-		"default_icon": {
-        	"16": "images/icon_16.png",
-        	"32": "images/icon_32.png",
-        	"48": "images/icon_48.png"
-      	}
-  	},
+	"page_action": {
+		"default_popup": "popup/popup.html",
+	"default_icon": {
+      	"16": "images/icon_16.png",
+      	"32": "images/icon_32.png",
+      	"48": "images/icon_48.png"
+    	}
+	},
 
-  	"icons": {
-    	"16": "images/icon_16.png",
-    	"32": "images/icon_32.png",
-    	"48": "images/icon_48.png",
-    	"128": "images/icon_128.png"
-  	},
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": false
+  },
+
+	"icons": {
+  	"16": "images/icon_16.png",
+  	"32": "images/icon_32.png",
+  	"48": "images/icon_48.png",
+  	"128": "images/icon_128.png"
+	},
 
 	"permissions": [
 		"webRequest",

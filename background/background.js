@@ -16,7 +16,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 				eventsArray = eventMessage[obj];
 			}
 		}
-
+ 
 		for (let [obj, body] of Object.entries(eventsArray)) {
 
 			// if event has subject property, legacyEvent = true
