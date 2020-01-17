@@ -1,9 +1,21 @@
 var messageArray = [];
+var endpointWhitelist = [];
 var popupOpen = false;
 var popupPort;
 var lastClosed = new Date(); // give starting value
 
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
+	console.log("fetch endpoints");
+	getEndpointsFromOptions();
+	}, {
+	// track events from both old and new tracking services
+	urls: ["*://my.izettle.com/"]
+	// urls: []
+}
+);
+
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
+	console.log("fetch events");
 	if(details.method == "POST") {
 
 		var requestPayload = decodeURIComponent(String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes)));
@@ -16,35 +28,68 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 				eventsArray = eventMessage[obj];
 			}
 		}
- 
-		for (let [obj, body] of Object.entries(eventsArray)) {
 
-			// if event has subject property, legacyEvent = true
-			var eventKeys = Object.keys(body);
-			var legacyEvent = eventKeys.includes("subject");
+		cleanEvents(eventsArray);
+		storeEvents();
 
-			// if new web tracking event...
-			if (legacyEvent == false) {
-				delete body['userUuid'], delete body['organizationUuid'],
-				delete body['device'], delete body['platform'],
-				delete body['page'], delete body['session'],
-				delete body['userAgent']
+	}
+}, {
+	// track events from both old and new tracking services
+	urls: ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"]
+	// urls: endpointWhitelist
+},
+	["requestBody"]
+);
 
 
-				// move latest event to front of array
-				messageArray.unshift(body);
-			}
-			else if (legacyEvent == true) {
-				// move latest event to front of array
-				messageArray.unshift(body);
-			}
+function getEndpointsFromOptions() {
+	// reset object
+	endpointWhitelist = [];
+
+  chrome.storage.sync.get({
+    endpointList: [],
+  }, function(endpoints) {
+    // console.log(endpoints.endpointList);
+    for (let url of Object.values(endpoints.endpointList)) {
+    	// add wildcard to front of endpoint url
+			var urlString = "*://".concat(url);
+			endpointWhitelist.push(urlString);
+    }
+  });
+	console.log(endpointWhitelist);
+}
+
+
+function cleanEvents(eventsArray) {
+	for (let [obj, body] of Object.entries(eventsArray)) {
+		// if event has subject property, legacyEvent = true
+		var eventKeys = Object.keys(body);
+		var legacyEvent = eventKeys.includes("subject");
+
+		// if new web tracking event...
+		if (legacyEvent == false) {
+			delete body['userUuid'], delete body['organizationUuid'],
+			delete body['device'], delete body['platform'],
+			delete body['page'], delete body['session'],
+			delete body['userAgent']
+
+
+			// move latest event to front of array
+			messageArray.unshift(body);
 		}
+		else if (legacyEvent == true) {
+			// move latest event to front of array
+			messageArray.unshift(body);
+		}
+	}
+}
 
+
+function storeEvents() {
 		// remove excess events from array
 		for (var i = 30; messageArray.length > i; i++) {
 			messageArray.pop();
 		}
-
 
 		// clear existing storage
 		chrome.storage.sync.set({'messageArray': []}, function() {
@@ -55,36 +100,12 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 		  console.log("save new object in storage");
 		});
 
-
 		if (popupOpen == true) {
 			chrome.runtime.sendMessage({message: "eventsReceived"}, function(response) {
 				console.log("sending events received while open");
 			});
 		}
-	}
-},
-
-
-{
-	// track events from both old and new tracking services
-	urls: ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"]
-},
-	["requestBody"]
-);
-
-
-// change icon from grayscale to colour if on correct page
-chrome.runtime.onInstalled.addListener(function() {
-	chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-		chrome.declarativeContent.onPageChanged.addRules([{
-			conditions: [new chrome.declarativeContent.PageStateMatcher({
-			  pageUrl: {hostEquals: 'my.izettle.com'},
-			})
-			],
-		    actions: [new chrome.declarativeContent.ShowPageAction()]
-		}]);
-	});
-});
+}
 
 
 function clearStorage() {
@@ -117,7 +138,6 @@ function clearLogOnTimeout() {
 
 // send event messages to popup.js when handshake message received
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-
 	if (request.message == "popupOpen") {
 		popupOpen = true;
 		console.log("popup opened");
@@ -149,4 +169,18 @@ chrome.runtime.onConnect.addListener(function(port) {
 			lastClosed = new Date();
     	});
 	}
+});
+
+
+// change icon from grayscale to colour if on correct page
+chrome.runtime.onInstalled.addListener(function() {
+	chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+		chrome.declarativeContent.onPageChanged.addRules([{
+			conditions: [new chrome.declarativeContent.PageStateMatcher({
+			  pageUrl: {hostEquals: 'my.izettle.com'},
+			})
+			],
+		    actions: [new chrome.declarativeContent.ShowPageAction()]
+		}]);
+	});
 });
