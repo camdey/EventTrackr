@@ -1,29 +1,41 @@
 <!DOCTYPE html>
 <html>
-<script src="../jquery-3.4.1.min.js"></script>
-<head><title>Tracking Options</title></head>
-<h2>Tracking Endpoints</h2>
-<p>Add your endpoints below to listen for event messages</p>
-<body>
+	<div class="optionsHeader">
+		<h2>Add New Endpoint</h2>
+		<p>Add your endpoints below to listen for event messages</p>
+	</div>
 
+	<body>
+		<div class="input-group">
+			<form id="urlForm">
+				<label for="endpointInput">URL:</label>
+				<input placeholder="my.website.com/tracking" id="endpointInput" name="endpointInput" type="text" size="60">
+				<span style="width:0;">
+					<button type="submit" id="addButton" form="urlForm">Add</button>
+				</span>
+			</form>
+		</div>
 
-<label>
-  <input type="text" id="endpoint">
-</label>
+		<div class="urlTable">
+			<table id="endpointsTable">
+				<div class="urlTableHeader">
+					<thead>
+						<hr>
+						<h2>Saved Endpoints</h2>
+					</thead>
+				</div>
+				<tbody>
+					<tr>
+						<th id="urlCol"> </th>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
-<div id="status"></div>
-<button id="save">Save</button>
+		<button type="button" id="deleteButton">Delete URLs</button>
 
-<div id="status"></div>
-<button id="clear">Clear</button>
-
-<table id="endpointsTable">
-  <thead>
-    <tr>
-      <th id="urlCol"> </th>
-    </tr>
-  </thead>
-
-<script src="options.js"></script>
-</body>
+		<script src="../jquery-3.4.1.min.js"></script>
+		<script src="options.js"></script>
+		<link rel="stylesheet" type="text/css" href="options.css">
+	</body>
 </html>
