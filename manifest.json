@@ -30,9 +30,8 @@
 	"permissions": [
 		"webRequest",
 		"storage",
-		"declarativeContent"
-//		"*://my.izettle.com/dachshund",
-//		"*://bo-tracking.izettle.com/track"
+		"declarativeContent",
+    "<all_urls>"
 	],
 	"web_accessible_resources": [
    		"images/amplitude_16.png",

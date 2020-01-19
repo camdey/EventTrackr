@@ -6,6 +6,7 @@ function save_url() {
   if (url.length > 0) {
 		addToArray(url);
 		addToTable(url);
+    notifyBackground();
   }
   else {console.log("please enter a URL at least 1 character long")}
 }
@@ -48,6 +49,8 @@ function fetch_from_storage () {
       addToTable(url)
     }
   });
+
+  notifyBackground();
 }
 
 function delete_urls() {
@@ -57,11 +60,22 @@ function delete_urls() {
   });
   // clear table
   $('#endpointsTable tr:gt(0)').remove();
+
+  notifyBackground();
 }
 
 // clear form after URL saved
 function clear_form() {
-	document.getElementById("urlForm").reset();
+	document.getElementById("urlForm").reset
+}
+
+
+// notify background.js of changes to endpoint list
+function notifyBackground() {
+  // send message to background to retrieve urls from storage
+  chrome.runtime.sendMessage({message: "fetchEndpoints"}, function(response) {
+    console.log("sending message to background.js to fetch endpoint urls");
+  });
 }
 
 document.addEventListener('DOMContentLoaded', fetch_from_storage);

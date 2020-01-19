@@ -1,26 +1,16 @@
 var messageArray = [];
-var endpointWhitelist = [];
 var popupOpen = false;
 var popupPort;
 var lastClosed = new Date(); // give starting value
+var arrayTest = ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"];
 
-chrome.webRequest.onBeforeRequest.addListener(function(details) {
-	console.log("fetch endpoints");
-	getEndpointsFromOptions();
-	}, {
-	// track events from both old and new tracking services
-	urls: ["*://my.izettle.com/"]
-	// urls: []
-}
-);
 
-chrome.webRequest.onBeforeRequest.addListener(function(details) {
-	console.log("fetch events");
+function eventSniffer(details) {
+	console.log("eventSniffer");
 	if(details.method == "POST") {
 
 		var requestPayload = decodeURIComponent(String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes)));
 		var eventMessage = JSON.parse(requestPayload);
-
 		var eventsArray = [];
 
 		for (var obj in eventMessage) {
@@ -32,31 +22,31 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 		cleanEvents(eventsArray);
 		storeEvents();
 
+		// chrome.extension.onBeforeRequest.removeListener(eventSniffer);
 	}
-}, {
-	// track events from both old and new tracking services
-	urls: ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"]
-	// urls: endpointWhitelist
-},
-	["requestBody"]
-);
+}
 
-
+// fetch endpoints from storage
 function getEndpointsFromOptions() {
-	// reset object
-	endpointWhitelist = [];
+	var endpointWhitelist = [];
+	// var endpointWhitelist = ["*://my.izettle.com/dachshund"];
 
   chrome.storage.sync.get({
     endpointList: [],
-  }, function(endpoints) {
+  },
+	function(endpoints) {
     // console.log(endpoints.endpointList);
     for (let url of Object.values(endpoints.endpointList)) {
     	// add wildcard to front of endpoint url
-			var urlString = "*://".concat(url);
+			var urlString = String("*://".concat(url));
 			endpointWhitelist.push(urlString);
     }
+
+		console.log("getEndpointsFromOptions()");
+		console.log(endpointWhitelist);
+
+		return endpointWhitelist;
   });
-	console.log(endpointWhitelist);
 }
 
 
@@ -109,7 +99,6 @@ function storeEvents() {
 
 
 function clearStorage() {
-	// empty array
 	messageArray = [];
 
 	chrome.storage.sync.set({'messageArray': []}, function() {
@@ -134,6 +123,30 @@ function clearLogOnTimeout() {
 		});
 	}
 }
+
+
+// listen for requests from the whitelisted urls
+chrome.webRequest.onBeforeRequest.addListener(
+	eventSniffer,
+	// {urls: arrayTest},
+	{urls: getEndpointsFromOptions()},
+	// {urls: ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"]},
+	["requestBody"]
+);
+
+
+// listen for new endpoint being added from options.js
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if (request.message == "fetchEndpoints") {
+		getEndpointsFromOptions();
+		console.log("option.js message received");
+		// flush cache of listeners
+		chrome.webRequest.handlerBehaviorChanged();
+		// chrome.extension.onBeforeRequest.removeListener(eventSniffer);
+	}
+
+	return true;
+});
 
 
 // send event messages to popup.js when handshake message received

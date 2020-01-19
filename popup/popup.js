@@ -26,7 +26,7 @@ const listEvents = eventArray => {
 		// if payload is not empty, enumerate through payload object
 		if (jQuery.isEmptyObject(eventArray[message].payload) == false) {
 			for (let [key, value] of Object.entries(eventArray[message].payload)) {
-				$('#eventsTable td.subject').first().append('<code><font size="2"><br/>' + "\u00A0 \u00A0" + 
+				$('#eventsTable td.subject').first().append('<code><font size="2"><br/>' + "\u00A0 \u00A0" +
 					key + ': ' + value + '</font></code>');
 			}
 		}
@@ -101,7 +101,6 @@ function parseSubject(eventMessage) {
 
 	var eventKeys = Object.keys(eventMessage);
 	var isLegacyEvent = eventKeys.includes("subject");
-
 	var newSubject = "";
 
 	if (isLegacyEvent == false) {
@@ -129,9 +128,7 @@ function getEvents(key, callback) {
 // receive message from background.js
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.message == "eventsReceived") {
-
 		var eventList = [];
-
 		// get events from storage
 		getEvents("readFromStorage", function(data) {
 			eventStorage = data;
@@ -150,16 +147,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 // only listen for button clicks after page finished loading
 document.addEventListener('DOMContentLoaded', function () {
-
 	document.getElementById("clearLogOnButtonClick").addEventListener("click", function() {
-
 		eventList = [];
 		listEvents(eventList);
-
 		// send message to background.js to clear data
 		chrome.runtime.sendMessage({message: "clearLogOnButtonClick"}, function(response) {});
 	});
-
 });
 
 // open port with background.js to detect when popup is closed
@@ -170,10 +163,8 @@ var bgPort = chrome.runtime.connect({name: "EventPopup"});
 window.onload = function() {
 	// let background.js know popup has opened
 	chrome.runtime.sendMessage({message: "popupOpen"}, function(response) {});
-
 	var eventList = [];
-
-    // get events from storage
+  // get events from storage
 	getEvents("readFromStorage", function(data) {
 		eventStorage = data;
 		processEvents(eventStorage, eventList);
