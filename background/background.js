@@ -2,7 +2,9 @@ var messageArray = [];
 var popupOpen = false;
 var popupPort;
 var lastClosed = new Date(); // give starting value
-var arrayTest = ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"];
+// var arrayTest = ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"];
+// var endpointWhitelist = ["*://my.izettle.com/dachshund"];
+var endpointWhitelist = [];
 
 
 function eventSniffer(details) {
@@ -12,13 +14,12 @@ function eventSniffer(details) {
 		var requestPayload = decodeURIComponent(String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes)));
 		var eventMessage = JSON.parse(requestPayload);
 		var eventsArray = [];
-
+		console.log(eventMessage);
 		for (var obj in eventMessage) {
 			if (obj == 'events') {
 				eventsArray = eventMessage[obj];
 			}
 		}
-
 		cleanEvents(eventsArray);
 		storeEvents();
 
@@ -28,14 +29,13 @@ function eventSniffer(details) {
 
 // fetch endpoints from storage
 function getEndpointsFromOptions() {
-	var endpointWhitelist = [];
-	// var endpointWhitelist = ["*://my.izettle.com/dachshund"];
+	// empty existing array first
+	endpointWhitelist.length = 0;
 
   chrome.storage.sync.get({
     endpointList: [],
   },
 	function(endpoints) {
-    // console.log(endpoints.endpointList);
     for (let url of Object.values(endpoints.endpointList)) {
     	// add wildcard to front of endpoint url
 			var urlString = String("*://".concat(url));
@@ -44,8 +44,11 @@ function getEndpointsFromOptions() {
 
 		console.log("getEndpointsFromOptions()");
 		console.log(endpointWhitelist);
+		console.log(JSON.stringify(endpointWhitelist));
 
-		return endpointWhitelist;
+		// return callback(endpointWhitelist);
+		// return endpointWhitelist;
+		eventListener(endpointWhitelist);
   });
 }
 
@@ -125,12 +128,45 @@ function clearLogOnTimeout() {
 }
 
 
-// listen for requests from the whitelisted urls
+// function updateWhitelist(urlList) {
+// 	return urlList;
+// }
+//
+// chrome.webRequest.onBeforeRequest.addListener(eventSniffer, {urls: getEndpointsFromOptions(updateWhitelist)}, ["requestBody"]);
+
+// if (chrome.webRequest.onBeforeRequest.hasListener(eventSniffer)) {
+//     chrome.webRequest.onBeforeRequest.removeListener(eventSniffer);
+// 	}
+// chrome.webRequest.onBeforeRequest.addListener(eventSniffer, {urls: endpointWhitelist}, ["requestBody"]);
+
+
+// getEndpointsFromOptions(function() {
+// 	if (chrome.webRequest.onBeforeRequest.hasListener(eventSniffer)) {
+//     chrome.webRequest.onBeforeRequest.removeListener(eventSniffer);
+// 	}
+// 	chrome.webRequest.onBeforeRequest.addListener(eventSniffer, {urls: endpointWhitelist}, ["requestBody"]);
+// });
+
+// function updateListener(getEndpointsFromOptions(function() {
+// 	  if (chrome.webRequest.onBeforeRequest.hasListener(eventSniffer)) {
+// 	    chrome.webRequest.onBeforeRequest.removeListener(eventSniffer);
+// 		}
+// 	  chrome.webRequest.onBeforeRequest.addListener(eventSniffer, {urls: endpointWhitelist}, ['requestBody']);
+// 	}){}
+// )
+
+function eventListener(whitelist) {
+	// listen for requests from the whitelisted urls
+	chrome.webRequest.onBeforeRequest.addListener(
+		eventSniffer,
+		{urls: whitelist},
+		["requestBody"]
+	);
+}
+
 chrome.webRequest.onBeforeRequest.addListener(
-	eventSniffer,
-	// {urls: arrayTest},
-	{urls: getEndpointsFromOptions()},
-	// {urls: ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"]},
+	getEndpointsFromOptions,
+	{urls: ["*://my.izettle.com/"],	types: ["main_frame"]},
 	["requestBody"]
 );
 
@@ -138,11 +174,18 @@ chrome.webRequest.onBeforeRequest.addListener(
 // listen for new endpoint being added from options.js
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.message == "fetchEndpoints") {
-		getEndpointsFromOptions();
 		console.log("option.js message received");
+		console.log("fetching endpoints from storage");
+		getEndpointsFromOptions();
+		// getEndpointsFromOptions(function() {
+			// var newArray = endpointWhitelist;
+			// console.log("inside callback");
+			// console.log("flushing cache");
+			// chrome.webRequest.handlerBehaviorChanged();
+		// });
 		// flush cache of listeners
-		chrome.webRequest.handlerBehaviorChanged();
 		// chrome.extension.onBeforeRequest.removeListener(eventSniffer);
+
 	}
 
 	return true;

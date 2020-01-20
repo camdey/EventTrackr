@@ -49,8 +49,6 @@ function fetch_from_storage () {
       addToTable(url)
     }
   });
-
-  notifyBackground();
 }
 
 function delete_urls() {
