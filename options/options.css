@@ -1,0 +1,23 @@
+#deleteButton {
+	display: block;
+	margin: 0 auto;
+	margin-top: 10px;
+	cursor: pointer;
+}
+
+#addButton {
+	cursor: pointer;
+}
+
+.optionsHeader {
+	margin: auto;
+	text-align: center;
+}
+
+.urlTableHeader {
+	margin-top: 20px;
+}
+
+h2, h3 {
+	text-align: center;
+}
