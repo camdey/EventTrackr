@@ -1,8 +1,6 @@
 var messageArray = [];
 var popupOpen = false;
 var popupPort;
-var lastClosed = new Date(); // give starting value
-// var arrayTest = ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"];
 var endpointWhitelist = [];
 
 // add listener for web requests
