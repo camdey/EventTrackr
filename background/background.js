@@ -3,14 +3,22 @@ var popupOpen = false;
 var popupPort;
 var lastClosed = new Date(); // give starting value
 // var arrayTest = ["*://my.izettle.com/dachshund", "*://bo-tracking.izettle.com/track"];
-// var endpointWhitelist = ["*://my.izettle.com/dachshund"];
 var endpointWhitelist = [];
+
+// add listener for web requests
+chrome.webRequest.onBeforeRequest.addListener(
+	function(details) {
+		validateUrl(details, eventSniffer)
+	},
+	{urls: ["<all_urls>"]},
+	["requestBody"]
+);
 
 
 function eventSniffer(details) {
 	console.log("eventSniffer");
-	if(details.method == "POST") {
 
+	if(details.method == "POST") {
 		var requestPayload = decodeURIComponent(String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes)));
 		var eventMessage = JSON.parse(requestPayload);
 		var eventsArray = [];
@@ -22,10 +30,23 @@ function eventSniffer(details) {
 		}
 		cleanEvents(eventsArray);
 		storeEvents();
-
-		// chrome.extension.onBeforeRequest.removeListener(eventSniffer);
 	}
 }
+
+
+function validateUrl(details, callback) {
+	var url = details.url;
+	for (let endpoint of Object.values(endpointWhitelist)) {
+		if (url == endpoint) {
+			console.log("validated url");
+			console.log(url);
+			callback(details);
+		}
+	}
+}
+
+// run on start
+getEndpointsFromOptions();
 
 // fetch endpoints from storage
 function getEndpointsFromOptions() {
@@ -37,18 +58,12 @@ function getEndpointsFromOptions() {
   },
 	function(endpoints) {
     for (let url of Object.values(endpoints.endpointList)) {
-    	// add wildcard to front of endpoint url
-			var urlString = String("*://".concat(url));
-			endpointWhitelist.push(urlString);
+			endpointWhitelist.push(url);
     }
 
 		console.log("getEndpointsFromOptions()");
 		console.log(endpointWhitelist);
 		console.log(JSON.stringify(endpointWhitelist));
-
-		// return callback(endpointWhitelist);
-		// return endpointWhitelist;
-		eventListener(endpointWhitelist);
   });
 }
 
@@ -88,7 +103,6 @@ function storeEvents() {
 		chrome.storage.sync.set({'messageArray': []}, function() {
 			console.log("storage cleared");
 		});
-
 		chrome.storage.sync.set({'messageArray': messageArray}, function() {
 		  console.log("save new object in storage");
 		});
@@ -103,7 +117,6 @@ function storeEvents() {
 
 function clearStorage() {
 	messageArray = [];
-
 	chrome.storage.sync.set({'messageArray': []}, function() {
 		console.log("storage cleared");
 	});
@@ -128,64 +141,12 @@ function clearLogOnTimeout() {
 }
 
 
-// function updateWhitelist(urlList) {
-// 	return urlList;
-// }
-//
-// chrome.webRequest.onBeforeRequest.addListener(eventSniffer, {urls: getEndpointsFromOptions(updateWhitelist)}, ["requestBody"]);
-
-// if (chrome.webRequest.onBeforeRequest.hasListener(eventSniffer)) {
-//     chrome.webRequest.onBeforeRequest.removeListener(eventSniffer);
-// 	}
-// chrome.webRequest.onBeforeRequest.addListener(eventSniffer, {urls: endpointWhitelist}, ["requestBody"]);
-
-
-// getEndpointsFromOptions(function() {
-// 	if (chrome.webRequest.onBeforeRequest.hasListener(eventSniffer)) {
-//     chrome.webRequest.onBeforeRequest.removeListener(eventSniffer);
-// 	}
-// 	chrome.webRequest.onBeforeRequest.addListener(eventSniffer, {urls: endpointWhitelist}, ["requestBody"]);
-// });
-
-// function updateListener(getEndpointsFromOptions(function() {
-// 	  if (chrome.webRequest.onBeforeRequest.hasListener(eventSniffer)) {
-// 	    chrome.webRequest.onBeforeRequest.removeListener(eventSniffer);
-// 		}
-// 	  chrome.webRequest.onBeforeRequest.addListener(eventSniffer, {urls: endpointWhitelist}, ['requestBody']);
-// 	}){}
-// )
-
-function eventListener(whitelist) {
-	// listen for requests from the whitelisted urls
-	chrome.webRequest.onBeforeRequest.addListener(
-		eventSniffer,
-		{urls: whitelist},
-		["requestBody"]
-	);
-}
-
-chrome.webRequest.onBeforeRequest.addListener(
-	getEndpointsFromOptions,
-	{urls: ["*://my.izettle.com/"],	types: ["main_frame"]},
-	["requestBody"]
-);
-
-
 // listen for new endpoint being added from options.js
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.message == "fetchEndpoints") {
 		console.log("option.js message received");
 		console.log("fetching endpoints from storage");
 		getEndpointsFromOptions();
-		// getEndpointsFromOptions(function() {
-			// var newArray = endpointWhitelist;
-			// console.log("inside callback");
-			// console.log("flushing cache");
-			// chrome.webRequest.handlerBehaviorChanged();
-		// });
-		// flush cache of listeners
-		// chrome.extension.onBeforeRequest.removeListener(eventSniffer);
-
 	}
 
 	return true;
