@@ -8,7 +8,6 @@ function save_url() {
 		addToTable(url);
     notifyBackground();
   }
-  else {console.log("please enter a URL at least 1 character long")}
 }
 
 function addToArray(url) {

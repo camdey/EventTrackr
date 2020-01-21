@@ -9,7 +9,8 @@
 		<div class="input-group">
 			<form id="urlForm">
 				<label for="endpointInput">URL:</label>
-				<input placeholder="my.website.com/tracking" id="endpointInput" name="endpointInput" type="text" size="60">
+				<input placeholder="https://my.website.com/tracking" id="endpointInput" name="endpointInput"
+					type="text" size="40" maxlength="60">
 				<span style="width:0;">
 					<button type="submit" id="addButton" form="urlForm">Add</button>
 				</span>
@@ -32,7 +33,7 @@
 			</table>
 		</div>
 
-		<button type="button" id="deleteButton">Delete URLs</button>
+		<button type="button" id="deleteButton">Delete All</button>
 
 		<script src="../jquery-3.4.1.min.js"></script>
 		<script src="options.js"></script>

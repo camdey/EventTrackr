@@ -16,8 +16,6 @@ chrome.webRequest.onBeforeRequest.addListener(
 
 
 function eventSniffer(details) {
-	console.log("eventSniffer");
-
 	if(details.method == "POST") {
 		var requestPayload = decodeURIComponent(String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes)));
 		var eventMessage = JSON.parse(requestPayload);
@@ -38,8 +36,6 @@ function validateUrl(details, callback) {
 	var url = details.url;
 	for (let endpoint of Object.values(endpointWhitelist)) {
 		if (url == endpoint) {
-			console.log("validated url");
-			console.log(url);
 			callback(details);
 		}
 	}
@@ -62,7 +58,6 @@ function getEndpointsFromOptions() {
     }
 
 		console.log("getEndpointsFromOptions()");
-		console.log(endpointWhitelist);
 		console.log(JSON.stringify(endpointWhitelist));
   });
 }
@@ -104,12 +99,12 @@ function storeEvents() {
 			console.log("storage cleared");
 		});
 		chrome.storage.sync.set({'messageArray': messageArray}, function() {
-		  console.log("save new object in storage");
+		  console.log("saved new object in storage");
 		});
 
 		if (popupOpen == true) {
 			chrome.runtime.sendMessage({message: "eventsReceived"}, function(response) {
-				console.log("sending events received while open");
+				console.log("sending events received while popup open");
 			});
 		}
 }
@@ -123,14 +118,12 @@ function clearStorage() {
 };
 
 
-function clearLogOnTimeout() {
+function clearLogOnTimeout(oldestReceived) {
 	var currentTime = new Date();
-	var elapsedMinutes = (currentTime - lastClosed) / 60000;
+	var elapsedMinutes = (currentTime - oldestReceived) / 60000;
 
-	if (elapsedMinutes >= 1) {
+	if (elapsedMinutes >= 30) {
 		console.log("cleared log after 30min inactivity")
-		console.log(elapsedMinutes);
-
 		clearStorage();
 
 		// send message to popup to clear UI
@@ -144,13 +137,20 @@ function clearLogOnTimeout() {
 // listen for new endpoint being added from options.js
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.message == "fetchEndpoints") {
-		console.log("option.js message received");
 		console.log("fetching endpoints from storage");
 		getEndpointsFromOptions();
 	}
-
 	return true;
 });
+
+
+// find oldest event and send to clearLogOnTimeout
+function getOldestEvent(callback) {
+	if (messageArray[messageArray.length-1].timestamp) {
+		var oldestReceived = new Date(messageArray[messageArray.length-1].timestamp);
+		callback(oldestReceived);
+	}
+}
 
 
 // send event messages to popup.js when handshake message received
@@ -158,10 +158,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.message == "popupOpen") {
 		popupOpen = true;
 		console.log("popup opened");
-
-		clearLogOnTimeout();
+		getOldestEvent(clearLogOnTimeout);
 	}
-
 	if (request.message == "clearLogOnButtonClick") {
 		// clear existing storage
 		clearStorage();
