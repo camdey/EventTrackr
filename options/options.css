@@ -16,6 +16,17 @@
 
 .urlTableHeader {
 	margin-top: 20px;
+	width: 100%;
+}
+
+#endpointsTable {
+	width: 100%;
+	display: table;
+}
+
+
+.urlTable {
+	width: 100%;
 }
 
 h2, h3 {
