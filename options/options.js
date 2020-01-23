@@ -1,35 +1,43 @@
 // Saves options to chrome.storage
-function saveUrl() {
+function saveUrl(event) {
+	// prevent reload on submit
+	event.preventDefault();
+
   var url = document.getElementById('endpointInput').value;
   console.log(url);
 
-  if (url.length > 0) {
-		addToArray(url);
-		addToTable(url);
-    notifyBackground();
-  }
+	if (url.length >= 5) {
+		// get stored array, proceed to add new url to this array in storage
+  	fetchFromStorage(function(array) {
+  		addToStorage(array, url, addToTable);
+		});
+	}
+	// notifyBackground();
 }
 
-function addToArray(url) {
-  chrome.storage.sync.get({
-    endpointList:[]
-  },
-  function(data) {
-    console.log(data.endpointList);
-    // storing the storage value in a variable and passing to update function
-    update(data.endpointList);
-  }
-  );
 
-  function update(array) {
-    array.push(url);
-    // then call the set to update with modified value
-    chrome.storage.sync.set({
-      endpointList:array
-    }, function() {
-      console.log("added to list with new values");
-    });
-  }
+function addToStorage(array, url, callback) {
+	// don't add duplicates
+	if (array.includes(url) == false) {
+		array.push(url);
+		// update array with new url
+		chrome.storage.sync.set({
+			endpointList: array
+		}, function() {
+			console.log("added url to storage");
+		});
+		// call addToTable() function
+		callback(url);
+	}
+}
+
+
+// add row to table
+function addToTable(url) {
+	console.log("appendTable");
+  $("#endpointsTable > tbody > tr:last").after("<tr><td>" + url + "</td>" +
+    "<td><button type='button' class='deleteRow' id=" + url + ">X</button></td>");
+	$("#endpointsTable").scrollTop($("#endpointsTable")[0].scrollHeight);
 }
 
 
@@ -39,15 +47,6 @@ function loadTable(urlList) {
   for (let url of Object.values(urlList)) {
     addToTable(url)
   }
-}
-
-
-// add row to table
-function addToTable(url) {
-  // rowButton = '<td><button type="button" id="deleteRow">X</button></td>'
-  $("#endpointsTable > tbody > tr:last").after("<tr><td>" + url + "</td>" +
-    "<td><button type='button' class='deleteRow' id=" + url + ">X</button></td>");
-	$("#endpointsTable").scrollTop($("#endpointsTable")[0].scrollHeight);
 }
 
 
