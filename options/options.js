@@ -10,12 +10,14 @@ function saveUrl(event) {
 		// get stored array, proceed to add new url to this array in storage
   	fetchFromStorage(function(array) {
   		addToStorage(array, url, addToTable);
+  		deleteRowOnClick();
+  		notifyBackground();
 		});
 	}
-	// notifyBackground();
 }
 
-
+// cant delete newly added rows ?????????
+// stored array, new url, callback to addToTable
 function addToStorage(array, url, callback) {
 	// don't add duplicates
 	if (array.includes(url) == false) {
@@ -29,15 +31,16 @@ function addToStorage(array, url, callback) {
 		// call addToTable() function
 		callback(url);
 	}
+	else { console.log("ignored duplicate"); }
 }
 
 
 // add row to table
 function addToTable(url) {
-	console.log("appendTable");
   $("#endpointsTable > tbody > tr:last").after("<tr><td>" + url + "</td>" +
     "<td><button type='button' class='deleteRow' id=" + url + ">X</button></td>");
 	$("#endpointsTable").scrollTop($("#endpointsTable")[0].scrollHeight);
+	$("#endpointsTable").find("deleteRow").click(deleteRowOnClick);
 }
 
 
@@ -47,22 +50,34 @@ function loadTable(urlList) {
   for (let url of Object.values(urlList)) {
     addToTable(url)
   }
-}
+
 
 
 // listen for row delete button, delete row, delete url from storage
-// doesn't work for duplicate entries (removed from storage but not table)
-$(document).ready(function() {
-  $(".deleteRow").click(function() {
+// $(document).ready(function() {
+// 	// bind the deleteRow button
+// 	deleteRowOnClick();
+// });
+
+// delete based on url and not index
+// call to bind delete row button
+function deleteRowOnClick() {
+	$(".deleteRow").click(function() {
+  	// get info about row
     var trRef = $(this).parent().parent();
+    console.log(trRef);
+    // extract row number
     rowNr = parseInt(trRef[0].rowIndex);
+    // remove based on row number
     $("#endpointsTable tr:eq(" + rowNr + ")").remove();
 
-    // get url at row
+    // get url from text for this row
     rowUrl = trRef[0].cells[0].innerText;
+    console.log(rowUrl);
 
+    // get current list of urls
     fetchFromStorage(function returnList(urlList){
-      // create a new array without url
+      // create a new array without deleted url
       var newUrlList = urlList.filter(function(url) {
         return url != rowUrl;
       });
@@ -72,7 +87,7 @@ $(document).ready(function() {
       notifyBackground();
     });
   });
-});
+}
 
 
 // Fetch saved URLs
