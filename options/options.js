@@ -37,10 +37,12 @@ function addToStorage(array, url, callback) {
 
 // add row to table
 function addToTable(url) {
-  $("#endpointsTable > tbody > tr:last").after("<tr><td>" + url + "</td>" +
-    "<td><button type='button' class='deleteRow' id=" + url + ">X</button></td>");
-	$("#endpointsTable").scrollTop($("#endpointsTable")[0].scrollHeight);
-	$("#endpointsTable").find("deleteRow").click(deleteRowOnClick);
+	rowId = url.replace(/[&\/\\#,+()$~%.'":*?<>{}-]/g, '');
+  $("#endpointsTable > tbody > tr:last").after("<tr id=" + rowId + "><td>" + url + "</td>" +
+    "<td style='text-align: right;'><button type='button' class='deleteRow' id=" + rowId + ">X</button></td>");
+	$("#buttonCol").attr('align', 'right');
+	// $("#endpointsTable").scrollTop($("#endpointsTable")[0].scrollHeight);
+	// $("#endpointsTable").find("deleteRow").click(deleteRowOnClick);
 }
 
 
@@ -50,30 +52,29 @@ function loadTable(urlList) {
   for (let url of Object.values(urlList)) {
     addToTable(url)
   }
-
+}
 
 
 // listen for row delete button, delete row, delete url from storage
-// $(document).ready(function() {
-// 	// bind the deleteRow button
-// 	deleteRowOnClick();
-// });
+$(document).ready(function() {
+	// bind the deleteRow button
+	deleteRowOnClick();
+});
 
 // delete based on url and not index
 // call to bind delete row button
 function deleteRowOnClick() {
-	$(".deleteRow").click(function() {
+	$(".deleteRow").off('click').on('click', function() {
+		event.preventDefault();
   	// get info about row
-    var trRef = $(this).parent().parent();
-    console.log(trRef);
-    // extract row number
-    rowNr = parseInt(trRef[0].rowIndex);
-    // remove based on row number
-    $("#endpointsTable tr:eq(" + rowNr + ")").remove();
-
+    var trRef = $(this).parent().parent()
     // get url from text for this row
     rowUrl = trRef[0].cells[0].innerText;
     console.log(rowUrl);
+		// remove special chaarcters to match id
+		rowId = rowUrl.replace(/[&\/\\#,+()$~%.'":*?<>{}-]/g, '');
+		// delete row
+    $("#" + rowId).remove();
 
     // get current list of urls
     fetchFromStorage(function returnList(urlList){
@@ -83,7 +84,7 @@ function deleteRowOnClick() {
       });
       // set new url list to the storage
       chrome.storage.sync.set({'endpointList': newUrlList });
-      // chrome.runtime.reload();
+			console.log(JSON.stringify(newUrlList));
       notifyBackground();
     });
   });
@@ -131,6 +132,7 @@ function notifyBackground() {
     console.log("sending message to background.js to fetch endpoint urls");
   });
 }
+
 
 document.addEventListener('DOMContentLoaded', fetchFromStorage(loadTable));
 document.getElementById('addButton').addEventListener('click', saveUrl);
