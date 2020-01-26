@@ -18,7 +18,7 @@ const listEvents = eventArray => {
 		}
 
 		$('#eventsTable tr:first').after(
-			'<tr><td>' + amplitudeIcon + '</td>' +
+			'<tr><td id="amplitudeIcon">' + amplitudeIcon + '</td>' +
 			'<td class="localTime"><font size="2">' + eventArray[message].localTime + '</font></td>' +
 			'<td class="subject"><font size="2">' + "\u00A0" + eventArray[message].subject + '</font></td></tr>'
 		);

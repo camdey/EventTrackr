@@ -35,7 +35,10 @@
 	],
 	"web_accessible_resources": [
    		"images/amplitude_16.png",
-   		"images/spacer_16.png"
+   		"images/spacer_16.png",
+      "fonts/Roboto-Regular.ttf",
+      "fonts/Roboto-Medium.ttf",
+      "fonts/Roboto-Thin.ttf"
  	],
 
 	"manifest_version": 2
