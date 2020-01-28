@@ -153,6 +153,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		// send message to background.js to clear data
 		chrome.runtime.sendMessage({message: "clearLogOnButtonClick"}, function(response) {});
 	});
+	// open options page on button click
+	document.getElementById("openOptionsPage").addEventListener("click", function() {
+		chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
+	});
 });
 
 // open port with background.js to detect when popup is closed
