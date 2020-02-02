@@ -5,7 +5,7 @@ html {
 
 body {
 	height: 100%;
-	width: 400px;
+	width: 420px;
 	padding-bottom: 0px;
 	background-color: #EDF0F2;
 	margin: 0px;
@@ -30,22 +30,28 @@ th {
   padding: 0px 0px 0px 0px;
 }
 
-.subject {
+#subject {
   font-family: RobotoRegular;
-  font-size: 12px;
 }
 
 /* column for time data */
-.localTime {
+#localTime {
 	vertical-align: top;
 	font-family: RobotoRegular;
-  font-size: 12px;
+}
+
+#payload {
+  font-size: 13px;
 }
 
 /* column for Amplitude icon */
 #amplitudeIcon {
   padding: 2px 5px 0px 2px;
 	vertical-align: top;
+}
+
+.rowText {
+  font-size: 14px;
 }
 
 .header {
@@ -75,7 +81,7 @@ th {
   text-align: center;
   font-family: RobotoRegular;
   font-size: 11pt;
-  padding: 7.5px 12.5px 7.5px 12.5px; /* top right bottom left */
+  padding: 6px 9px 6px 9px; /* top right bottom left */
 }
 
 .clearBtn:hover {
@@ -102,7 +108,7 @@ th {
   text-align: center;
   font-family: RobotoRegular;
   font-size: 10pt;
-  padding: 5px 10px 5px 10px; /* top right bottom left */
+  padding: 5px 9px 5px 9px; /* top right bottom left */
 }
 
 .optionsBtn:hover {
