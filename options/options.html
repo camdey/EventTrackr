@@ -10,7 +10,7 @@
 			<form id="urlForm">
 				<label for="endpointInput">URL:</label>
 				<input placeholder="https://my.website.com/tracking" id="endpointInput" name="endpointInput"
-					type="text" size="40" maxlength="60">
+					type="text" size="40" minlength="5" maxlength="60">
 				<span style="width:0;">
 					<button type="submit" id="addButton" form="urlForm">Add</button>
 				</span>
@@ -27,7 +27,8 @@
 				</div>
 				<tbody>
 					<tr>
-						<th id="urlCol"> </th>
+						<th id="urlCol"></th>
+						<th id="buttonCol"></th>
 					</tr>
 				</tbody>
 			</table>

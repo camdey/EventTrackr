@@ -34,8 +34,8 @@
     "<all_urls>"
 	],
 	"web_accessible_resources": [
-   		"images/amplitude_16.png",
-   		"images/spacer_16.png"
+    "images/*",
+    "fonts/*"
  	],
 
 	"manifest_version": 2

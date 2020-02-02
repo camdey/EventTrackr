@@ -4,24 +4,19 @@
     <script type="text/javascript" src="popup.js"></script>
     <script src="../jquery-3.4.1.min.js"></script>
     <link rel="stylesheet" type="text/css" href="popup.css">
-    <style>
-    body {}
-    </style>
   </head>
 <body>
-	<div id="tableDiv">
-		<h1>Event Log</h1>
-		<button
-			type="button"
-			button id="clearLogOnButtonClick"
-			class="clearBtn">Clear Log
-		</button>
+  <div class="header">
+    <h1 id="popupTitle">EventTrackr </h1>
+		<button type="button" button id="openOptionsPage" class="optionsBtn">Options</button>
+  </div>
+	<div class="main" id="tableDiv">
 		<table id="eventsTable">
 			<thead>
 				<tr>
 					<th id="AmplitudeCol"> </th>
-					<th id="TimeCol"> Time </th>
-					<th id="EventCol"> Event </th>
+					<th id="TimeCol"> Sent </th>
+					<th id="EventCol"> Event Type </th>
         </tr>
  			</thead>
 			<tbody>
@@ -29,5 +24,8 @@
 			</tbody>
 		</table>
 	</div>
+  <div class="footer">
+    <button type="button" button id="clearLogOnButtonClick" class="clearBtn">Clear Log</button>
+  </div>
 </body>
 </html>

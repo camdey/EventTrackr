@@ -1,4 +1,3 @@
-// var eventList = [];
 var eventStorage = [];
 
 const listEvents = eventArray => {
@@ -18,16 +17,16 @@ const listEvents = eventArray => {
 		}
 
 		$('#eventsTable tr:first').after(
-			'<tr><td>' + amplitudeIcon + '</td>' +
-			'<td class="localTime"><font size="2">' + eventArray[message].localTime + '</font></td>' +
-			'<td class="subject"><font size="2">' + "\u00A0" + eventArray[message].subject + '</font></td></tr>'
+			'<tr><td id="amplitudeIcon">' + amplitudeIcon + '</td>' +
+			'<td id="localTime" class="rowText">' + eventArray[message].localTime + '</td>' +
+			'<td id="subject" class="rowText">' + "\u00A0" + eventArray[message].subject + '</td></tr>'
 		);
 
 		// if payload is not empty, enumerate through payload object
 		if (jQuery.isEmptyObject(eventArray[message].payload) == false) {
 			for (let [key, value] of Object.entries(eventArray[message].payload)) {
-				$('#eventsTable td.subject').first().append('<code><font size="2"><br/>' + "\u00A0 \u00A0" +
-					key + ': ' + value + '</font></code>');
+				$('#eventsTable #subject').first().append('<code id="payload"><br/>' + "\u00A0 \u00A0" +
+					key + ': ' + value + '</code>');
 			}
 		}
 
@@ -38,6 +37,7 @@ const listEvents = eventArray => {
 		$('#eventsTable tr:gt(0)').remove();
 	}
 };
+
 
 function processEvents(eventStorage, eventList) {
 	eventStorage = Object.values(eventStorage)[0];
@@ -53,11 +53,11 @@ function processEvents(eventStorage, eventList) {
 	listEvents(eventList);
 }
 
+
 // check for payload, if exists send to payload parsing function
 // send event for subject parsing
 // convert timestamp to local time
 function parseEvent(eventMessage, eventList) {
-
 	// check message for payload object
 	for (let [eventField, eventValue] of Object.entries(eventMessage)) {
 		// if field is payload and payload is not empty...
@@ -70,35 +70,35 @@ function parseEvent(eventMessage, eventList) {
 	parseSubject(eventMessage)
 
 	// convert event timestamp to local time
-	let localTime = new Date(eventMessage.timestamp).toLocaleTimeString();;
+	let localTime = new Date(eventMessage.timestamp).toLocaleTimeString([], {hour12: false});
 	eventMessage.localTime = localTime;
 
 	// push parsed events to array
 	eventList.push(eventMessage);
 };
 
-function parsePayload(eventMessage, payloadObject) {
 
-    // if errors not empty, only take first error and move to payload
-    if (jQuery.isEmptyObject(payloadObject.errors) == false) {
-    	Object.assign(payloadObject, payloadObject.errors[0]);
-    	delete payloadObject['errors'];
-    }
-  	// if filter empty, ignore filter
-  	if (jQuery.isEmptyObject(payloadObject.filter) == true) {
-  		delete payloadObject['filter'];
+function parsePayload(eventMessage, payloadObject) {
+  // if errors not empty, only take first error and move to payload
+  if (jQuery.isEmptyObject(payloadObject.errors) == false) {
+  	Object.assign(payloadObject, payloadObject.errors[0]);
+  	delete payloadObject['errors'];
+  }
+	// if filter empty, ignore filter
+	if (jQuery.isEmptyObject(payloadObject.filter) == true) {
+		delete payloadObject['filter'];
 	}
 	// if filter is not empty, move filter to payload
-  	else if (jQuery.isEmptyObject(payloadObject.filter) == false) {
-  		// eventMessage.payload = payloadObject.filter;
-  		Object.assign(payloadObject, payloadObject.filter);
-  		delete payloadObject['filter'];
-  	}
+	else if (jQuery.isEmptyObject(payloadObject.filter) == false) {
+		// eventMessage.payload = payloadObject.filter;
+		Object.assign(payloadObject, payloadObject.filter);
+		delete payloadObject['filter'];
+	}
 }
+
 
 // for new events, concatenate event name fields into one
 function parseSubject(eventMessage) {
-
 	var eventKeys = Object.keys(eventMessage);
 	var isLegacyEvent = eventKeys.includes("subject");
 	var newSubject = "";
@@ -117,6 +117,7 @@ function parseSubject(eventMessage) {
 	}
 }
 
+
 function getEvents(key, callback) {
     if(key != null) {
         chrome.storage.sync.get('messageArray', function(data) {
@@ -124,6 +125,7 @@ function getEvents(key, callback) {
         });
     }
 };
+
 
 // receive message from background.js
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -153,7 +155,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		// send message to background.js to clear data
 		chrome.runtime.sendMessage({message: "clearLogOnButtonClick"}, function(response) {});
 	});
+	// open options page on button click
+	document.getElementById("openOptionsPage").addEventListener("click", function() {
+		chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
+	});
 });
+
 
 // open port with background.js to detect when popup is closed
 var bgPort = chrome.runtime.connect({name: "EventPopup"});
