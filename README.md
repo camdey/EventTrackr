@@ -2,7 +2,12 @@
 
 A Chrome extension for logging and viewing event tracking messages sent in the background.
 
-<img width="406" alt="event-listener" src="https://user-images.githubusercontent.com/11826434/73140989-5fc52000-407f-11ea-9b72-3e73739e30c3.png">
+### Popup UI
+<img width="406" alt="event-listener" src="https://user-images.githubusercontent.com/11826434/73614571-9a3f3780-4600-11ea-940d-7c6bd55bafad.png">
+
+### Options UI
+<img width="406" alt="event-listener" src="https://user-images.githubusercontent.com/11826434/73614583-c3f85e80-4600-11ea-9152-7647314ff828.png">
+
 
 ## Overview
 
