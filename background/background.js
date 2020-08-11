@@ -47,17 +47,30 @@ function getEndpointsFromOptions() {
 	// empty existing array first
 	endpointWhitelist.length = 0;
 
-  chrome.storage.sync.get({
-    endpointList: [],
-  },
+	chrome.storage.sync.get({
+		endpointList: [],
+	},
 	function(endpoints) {
-    for (let url of Object.values(endpoints.endpointList)) {
+		for (let url of Object.values(endpoints.endpointList)) {
 			endpointWhitelist.push(url);
-    }
+			
+			url = url.replace("https://", "");
+			// add url to whitelisted websites for enabling extension functionality
+			chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+				chrome.declarativeContent.onPageChanged.addRules([{
+					conditions: [
+						new chrome.declarativeContent.PageStateMatcher({
+					  	pageUrl: {hostEquals: url},
+						})
+					],
+				    actions: [new chrome.declarativeContent.ShowPageAction()]
+				}]);
+			});
+		}
 
-		console.log("getEndpointsFromOptions()");
-		console.log(JSON.stringify(endpointWhitelist));
-  });
+		// console.log("getEndpointsFromOptions()");
+		// console.log(JSON.stringify(endpointWhitelist));
+	});
 }
 
 
@@ -182,22 +195,4 @@ chrome.runtime.onConnect.addListener(function(port) {
 			lastClosed = new Date();
     	});
 	}
-});
-
-
-// change icon from grayscale to colour if on correct page
-chrome.runtime.onInstalled.addListener(function() {
-	chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-		chrome.declarativeContent.onPageChanged.addRules([{
-			conditions: [
-				new chrome.declarativeContent.PageStateMatcher({
-			  	pageUrl: {hostEquals: 'my.izettle.com'},
-				}),
-				new chrome.declarativeContent.PageStateMatcher({
-			  	pageUrl: {hostEquals: 'my.izettletest.com'},
-				})
-			],
-		    actions: [new chrome.declarativeContent.ShowPageAction()]
-		}]);
-	});
 });
