@@ -1,4 +1,4 @@
-# EventListener
+# EventTrackr
 
 A Chrome extension for logging and viewing event tracking messages sent in the background.
 
