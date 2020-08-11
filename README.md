@@ -11,7 +11,7 @@ A Chrome extension for logging and viewing event tracking messages sent in the b
 
 ## Overview
 
-EventListener only listens for http requests sent to specific, whitelisted, URLs. It picks from these only POST requests and extracts the event message from *details.requestBody.raw*.
+EventTrackr only listens for http requests sent to specific, whitelisted, URLs. It picks from these only POST requests and extracts the event message from *details.requestBody.raw*.
 
 The event message object is stored in Chrome sync storage. If the extension's popup is closed, the message remains in storage until the popup is opened.
 
